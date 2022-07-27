@@ -9,34 +9,45 @@
 
 <h2>OCCT WebGL Viewer Sample</h2>
 <div>
-  <canvas id=occViewerCanvas oncontextmenu=event.preventDefault() tabindex=-1 style="border:0 none;background-color:#000" width="409" height="800"></canvas>
-
+  <canvas id=occViewerCanvas oncontextmenu=event.preventDefault() tabindex=-1 style="border:0 none;background-color:#000" width="1200" height="800"></canvas>
 </div>
   
 <div>
   <label for="fileInput">Choose BREP file to upload: </label><input type="file" id="fileInput" accept=".brep">
   <input type="button" value="Clear All" onclick="OccViewerModule.removeAllObjects()">
   <input type="button" value="Fit All"   onclick="OccViewerModule.fitAllObjects(true)">
-  <input type="button" value="MakeBox"   onclick="OccViewerModule.fitAllObjects(true)">
+  <input type="button" value="MakeBox"   onclick="makeBox()">
+  <input type="button" value="MakeCylinder"   onclick="makeCylinder()">
 </div>
 <h4>Console output:</h4>
 <p id="output"></p>
 <script>
+
+function makeBox() {
+
+  OccViewerModule.makeBox("bo", 0, 0, 0, 12, 7, 5);
+
+}
+
+function makeCylinder() {
+  OccViewerModule.makeCylinder();
+}
+
 //! Resize canvas to fit into window.
 function updateCanvasSize()
 {
   // size of canvas in logical (density-independent) units
-  var aSizeX = Math.min (window.innerWidth,  window.screen.availWidth);
-  var aSizeY = Math.min (window.innerHeight, window.screen.availHeight);
-  aSizeX = Math.max (300, aSizeX - 30);
-  aSizeY = Math.max (300, aSizeY / 2);
-  occViewerCanvas.style.width  = aSizeX + "px";
-  occViewerCanvas.style.height = aSizeY + "px";
+  // var aSizeX = Math.min (window.innerWidth,  window.screen.availWidth);
+  // var aSizeY = Math.min (window.innerHeight, window.screen.availHeight);
+  // aSizeX = Math.max (300, aSizeX - 30);
+  // aSizeY = Math.max (300, aSizeY / 2);
+  // occViewerCanvas.style.width  = aSizeX + "px";
+  // occViewerCanvas.style.height = aSizeY + "px";
 
-  // drawing buffer size (aka backing store)
-  var aDevicePixelRatio = window.devicePixelRatio || 1;
-  occViewerCanvas.width  = aSizeX * aDevicePixelRatio;
-  occViewerCanvas.height = aSizeY * aDevicePixelRatio;
+  // // drawing buffer size (aka backing store)
+  // var aDevicePixelRatio = window.devicePixelRatio || 1;
+  // occViewerCanvas.width  = aSizeX * aDevicePixelRatio;
+  // occViewerCanvas.height = aSizeY * aDevicePixelRatio;
 
 }
 window.onresize = updateCanvasSize;

@@ -89,6 +89,16 @@ public: //! @name methods exported by Module
                               uintptr_t theBuffer, int theDataLen,
                               bool theToFree);
 
+  static bool makeBox(const std::string& theName,
+                      Standard_Real originX, 
+                      Standard_Real originY, 
+                      Standard_Real originZ, 
+                      Standard_Real X, 
+                      Standard_Real Y, 
+                      Standard_Real Z);
+
+  static bool makeCylinder();   
+
   //! Open BRep object from memory.
   //! @param theName    [in] object name
   //! @param theBuffer  [in] pointer to data

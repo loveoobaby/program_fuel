@@ -1749,8 +1749,8 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  1698320: function() {Module['noExitRuntime'] = true},  
- 1698351: function($0, $1, $2, $3) {Module.ctx.getBufferSubData($0, $1, HEAPU8.subarray($2, $2 + $3));}
+  1699456: function() {Module['noExitRuntime'] = true},  
+ 1699487: function($0, $1, $2, $3) {Module.ctx.getBufferSubData($0, $1, HEAPU8.subarray($2, $2 + $3));}
 };
 function OSD_MemInfo_getModuleHeapLength(){ return Module.HEAP8.length; }
 function jsGetBoundingClientLeft(){ return Math.round(Module._myCanvasRect.left); }
@@ -12371,6 +12371,7 @@ var asmLibraryArg = {
   "invoke_iii": invoke_iii,
   "invoke_iiid": invoke_iiid,
   "invoke_iiidd": invoke_iiidd,
+  "invoke_iiiddd": invoke_iiiddd,
   "invoke_iiidddd": invoke_iiidddd,
   "invoke_iiidddddd": invoke_iiidddddd,
   "invoke_iiiddddi": invoke_iiiddddi,
@@ -14473,6 +14474,17 @@ function invoke_iiiidd(index,a1,a2,a3,a4,a5) {
   }
 }
 
+function invoke_iiiddd(index,a1,a2,a3,a4,a5) {
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2,a3,a4,a5);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
+}
+
 function invoke_vidddi(index,a1,a2,a3,a4,a5) {
   var sp = stackSave();
   try {
@@ -16199,5 +16211,5 @@ var OccViewerModule =
 const OccViewerModuleInitialized = createOccViewerModule(OccViewerModule);
 OccViewerModuleInitialized.then(function(Module) {
   //OccViewerModule.setCubemapBackground ("cubemap.jpg");
-  OccViewerModule.openFromUrl ("ball", "samples/Ball.brep");
+  // OccViewerModule.openFromUrl ("ball", "samples/Ball.brep");
 });
