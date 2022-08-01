@@ -33,6 +33,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
 file(GLOB SOURCES
   *.h
   *.cpp
+  *.cxx
 )
 source_group ("Headers" FILES
   WasmOcctView.h)

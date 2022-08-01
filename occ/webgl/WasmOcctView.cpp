@@ -39,13 +39,21 @@
 #include <BRepBndLib.hxx>
 #include <BRepTools.hxx>
 #include <Standard_ArrayStreamBuffer.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
+#include <AIS_Point.hxx>
 
 #include <emscripten/bind.h>
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <BRepPrimAPI_MakeCylinder.hxx>
+#include <Geom_ToroidalSurface.hxx>
+#include <gp_Torus.hxx>
+#include <Geom_CartesianPoint.hxx>
+#include <exception>
 
+#include <AIS_TextLabel.hxx>
 #include <iostream>
 #include <Geom_Plane.hxx>
+#include "AdaptorVec_AIS.h"
 
 #define THE_CANVAS_ID "canvas"
 
@@ -1015,6 +1023,98 @@ void WasmOcctView::displayGround(bool theToShow)
   aViewer.UpdateView();
 }
 
+bool WasmOcctView::displayObject2(const std::string &theName, Handle(AIS_InteractiveObject) &object, AIS_DisplayMode mode) {
+   
+        WasmOcctView &aViewer = Instance();
+        Message::DefaultMessenger()->Send("----------------", Message_Info);
+        aViewer.myObjects.Add(theName.c_str(), object);
+        aViewer.Context()->Display(object, mode, 0, false);
+        aViewer.View()->FitAll(0.05, false);
+        aViewer.UpdateView();
+        Message::DefaultMessenger()->Send("----------finished------", Message_Info);
+    return true;
+
+ 
+}
+
+bool WasmOcctView::makeVector() {
+
+
+
+  // gp_Torus aBaseTorus(gp_Ax3(gp_Pnt(), gp_Dir(0.0, 0.0, 1.0)), 40.0, 10.0);
+  // gp_Torus aTranslatedTorus = aBaseTorus.Translated(gp_Vec(70.0, 70.0, 70.0));
+
+  // Handle(Geom_ToroidalSurface) aBaseSurface = new Geom_ToroidalSurface(aBaseTorus);
+  // Handle(AIS_Shape) anAisBaseShape = new AIS_Shape(BRepBuilderAPI_MakeFace(
+  //   aBaseSurface, 0.0, 2.0*M_PI, 0.0, 2.0*M_PI, Precision::Confusion()).Shape());
+
+  // WasmOcctView &aViewer = Instance();
+  
+  // aViewer.Context()->Display(anAisBaseShape, AIS_Shaded, 0, false);
+  // aViewer.View()->FitAll(0.01, false);
+  // aViewer.UpdateView();
+
+  // gp_Pnt aCoordPnt(10.0, 20.0, 30.0);
+  // Handle(Geom_CartesianPoint) aCoordGeomPoint = new Geom_CartesianPoint(aCoordPnt);
+  // Handle(AIS_Point) aCoordAisPoint = new AIS_Point(aCoordGeomPoint);
+
+  // WasmOcctView::displayObject2("p1", aCoordAisPoint, AIS_WireFrame);
+
+  // Handle(AIS_TextLabel) aPntLabel = new AIS_TextLabel();
+  // aPntLabel->SetText("  gp_Pnt");
+  // aPntLabel->SetPosition(gp_Pnt(aCoordPnt.X(), aCoordPnt.Y(), aCoordPnt.Z() + 5.0));
+  // // WasmOcctView::displayObject2("label2", aPntLabel);
+
+  // WasmOcctView &aViewer = Instance();
+  // aViewer.Context()->Display(aPntLabel, AIS_Shaded, 0, false);
+  // aViewer.View()->FitAll(0.01, false);
+  // aViewer.UpdateView();
+
+
+  // Define a 4x4 grid of points for BSpline surface.
+  TColgp_Array2OfPnt aPoints(1, 4, 1, 4);
+  for (Standard_Integer i = 1; i <= 4; ++i)
+  {
+    gp_Pnt aPnt;
+    aPnt.SetX(5.0 * i);
+    for (Standard_Integer j = 1; j <= 4; ++j)
+    {
+      aPnt.SetY(5.0 * j);
+      if (1 < i && i < 4 && 1 < j && j < 4)
+      {
+        aPnt.SetZ(5.0);
+      }
+      else
+      {
+        aPnt.SetZ(0.0);
+      }
+      aPoints.SetValue(i, j, aPnt);
+    }
+  }
+
+  // Make a BSpline surface from the points array.
+  Handle(Geom_BSplineSurface) aBSplineSurf = GeomAPI_PointsToBSplineSurface(aPoints).Surface();
+  
+  // Compute BSpline surface bounding box.
+  Bnd_Box aBndBox;
+  BndLib_AddSurface::AddOptimal(GeomAdaptor_Surface(aBSplineSurf), Precision::Confusion(), aBndBox);
+
+  Handle(AIS_ColoredShape) anAisBSplineSurf = new AIS_ColoredShape(
+    BRepBuilderAPI_MakeFace(aBSplineSurf, Precision::Confusion()).Shape());
+  Handle(AIS_ColoredShape) anAisBndBox = new AIS_ColoredShape(
+    BRepPrimAPI_MakeBox(aBndBox.CornerMin(), aBndBox.CornerMax()).Shell());
+  
+  WasmOcctView::displayObject2("plane2", anAisBSplineSurf);
+
+  Message::DefaultMessenger()->Send("makeVector finised", Message_Trace);
+  return true;
+}
+
+
+
+
+
+
 // Module exports
 EMSCRIPTEN_BINDINGS(OccViewerModule)
 {
@@ -1029,5 +1129,7 @@ EMSCRIPTEN_BINDINGS(OccViewerModule)
   emscripten::function("openFromMemory", &WasmOcctView::openFromMemory, emscripten::allow_raw_pointers());
   emscripten::function("makeBox", &WasmOcctView::makeBox, emscripten::allow_raw_pointers());
   emscripten::function("makeCylinder", &WasmOcctView::makeCylinder);
+  emscripten::function("makeVector", &WasmOcctView::makeVector);
   emscripten::function("openBRepFromMemory", &WasmOcctView::openBRepFromMemory, emscripten::allow_raw_pointers());
+  
 }

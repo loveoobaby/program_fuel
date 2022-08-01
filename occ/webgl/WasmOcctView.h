@@ -29,6 +29,22 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 
+#include <AIS_DisplayMode.hxx>
+#include <AIS_Plane.hxx>
+#include <gp_Cylinder.hxx>
+#include <Geom_CylindricalSurface.hxx>
+#include <gp_Cone.hxx>
+#include <Geom_ConicalSurface.hxx>
+#include <Geom_SphericalSurface.hxx>
+#include <gp_Sphere.hxx>
+#include <TColgp_Array2OfPnt.hxx>
+#include <AIS_ColoredShape.hxx>
+#include <Geom_BSplineSurface.hxx>
+#include <GeomAPI_PointsToBSplineSurface.hxx>
+#include <BndLib_AddSurface.hxx>
+#include <BndLib_AddSurface.hxx>
+#include <GeomAdaptor_Surface.hxx>
+
 class AIS_ViewCube;
 
 //! Sample class creating 3D Viewer within Emscripten canvas.
@@ -89,6 +105,8 @@ public: //! @name methods exported by Module
                               uintptr_t theBuffer, int theDataLen,
                               bool theToFree);
 
+  static bool displayObject2(const std::string &theName, Handle(AIS_InteractiveObject) &object, AIS_DisplayMode mode = AIS_Shaded);                             
+
   static bool makeBox(const std::string& theName,
                       Standard_Real originX, 
                       Standard_Real originY, 
@@ -97,7 +115,11 @@ public: //! @name methods exported by Module
                       Standard_Real Y, 
                       Standard_Real Z);
 
-  static bool makeCylinder();   
+  static bool makeCylinder();  
+
+  static bool makeVector();  
+
+  
 
   //! Open BRep object from memory.
   //! @param theName    [in] object name

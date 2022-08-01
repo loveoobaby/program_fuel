@@ -1,0 +1,63 @@
+  gp_Cylinder aCylinder(gp_Ax3(gp_Pnt(0.0, 0.0, 10.0), gp_Dir(0.0, 0.0, 1.0)), 10.0);
+  Handle(Geom_CylindricalSurface) aCylindricalSurface = new Geom_CylindricalSurface(aCylinder);
+  Handle(AIS_Shape) anAisCylinder = new AIS_Shape(BRepBuilderAPI_MakeFace(
+    aCylindricalSurface, 0.0, 2.0*M_PI, 0.0, 10.0, Precision::Confusion()).Shape());
+
+
+
+   gp_Cone aCone(gp_Ax3(gp_Pnt(0.0, 0.0, 30.0), gp_Dir(0.0, 0.0, 1.0)), 0.25*M_PI, 0.0);
+  Handle(Geom_ConicalSurface) aConicalSurface = new Geom_ConicalSurface(aCone);
+  Handle(AIS_Shape) anAisCone = new AIS_Shape(BRepBuilderAPI_MakeFace(
+    aConicalSurface, 0.0, 2.0*M_PI, 0.0, 20.0, Precision::Confusion()).Shape());
+
+
+
+   gp_Sphere aSphere(gp_Ax3(gp_Pnt(0.0, 0.0, 0.0), gp_Dir(0.0, 0.0, 1.0)), 10.0);
+  Handle(Geom_SphericalSurface) aSphericalSurface = new Geom_SphericalSurface(aSphere);
+  Handle(AIS_Shape) anAisSphere = new AIS_Shape(BRepBuilderAPI_MakeFace(
+    aSphericalSurface, 0.0, 2.0*M_PI, 0.0, 2.0*M_PI, Precision::Confusion()).Shape());
+  WasmOcctView::displayObject2("plane2", anAisSphere);  
+
+
+
+    gp_Torus aTorus(gp_Ax3(gp_Pnt(0.0, 0.0, 20.0), gp_Dir(0.0, 0.0, 1.0)), 40.0, 10.0);
+  Handle(Geom_ToroidalSurface) aToroidalSurface = new Geom_ToroidalSurface(aTorus);
+  Handle(AIS_Shape) anAisTorus = new AIS_Shape(BRepBuilderAPI_MakeFace(
+    aToroidalSurface, 0.0, 2.0*M_PI, 0.0, 2.0*M_PI, Precision::Confusion()).Shape());
+  WasmOcctView::displayObject2("plane2", anAisTorus);
+
+
+
+    TColgp_Array2OfPnt aPoints(1, 4, 1, 4);
+  for (Standard_Integer i = 1; i <= 4; ++i)
+  {
+    gp_Pnt aPnt;
+    aPnt.SetX(5.0 * i);
+    for (Standard_Integer j = 1; j <= 4; ++j)
+    {
+      aPnt.SetY(5.0 * j);
+      if (1 < i && i < 4 && 1 < j && j < 4)
+      {
+        aPnt.SetZ(5.0);
+      }
+      else
+      {
+        aPnt.SetZ(0.0);
+      }
+      aPoints.SetValue(i, j, aPnt);
+    }
+  }
+
+  // Make a BSpline surface from the points array.
+  Handle(Geom_BSplineSurface) aBSplineSurf = GeomAPI_PointsToBSplineSurface(aPoints).Surface();
+  
+  // Compute BSpline surface bounding box.
+  Bnd_Box aBndBox;
+  BndLib_AddSurface::AddOptimal(GeomAdaptor_Surface(aBSplineSurf), Precision::Confusion(), aBndBox);
+
+  Handle(AIS_ColoredShape) anAisBSplineSurf = new AIS_ColoredShape(
+    BRepBuilderAPI_MakeFace(aBSplineSurf, Precision::Confusion()).Shape());
+  Handle(AIS_ColoredShape) anAisBndBox = new AIS_ColoredShape(
+    BRepPrimAPI_MakeBox(aBndBox.CornerMin(), aBndBox.CornerMax()).Shell());
+  
+  WasmOcctView::displayObject2("plane2", anAisBSplineSurf);    
